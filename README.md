@@ -1,9 +1,9 @@
 # 房贷组合贷计算器
 
-> 一个纯前端、离线可用的房贷计算工具，支持商业贷款、公积金贷款、组合贷款，多方案横向对比，数据本地存储。
+> 一个纯前端、离线可用的房贷计算工具，支持商业贷款、公积金贷款、组合贷款，多方案横向对比，数据本地存储。基于 Vue 3 + Vite 构建。
 
-[![](https://img.shields.io/badge/-HTML5-orange.svg)]()
-[![](https://img.shields.io/badge/-CSS3-blue.svg)]()
+[![](https://img.shields.io/badge/-Vue%203-42b883.svg)]()
+[![](https://img.shields.io/badge/-Vite%207-646cff.svg)]()
 [![](https://img.shields.io/badge/-JavaScript-yellow.svg)]()
 [![](https://img.shields.io/badge/license-MIT-green.svg)]()
 
@@ -25,56 +25,99 @@
     - 横屏查看模式：转置竖表格（项目在左，方案在右）
     - 支持导出 CSV 文件
 - **数据持久化**：所有配置与对比列表自动保存到浏览器 `localStorage`，刷新不丢失
+- **按需测算**：首次访问不显示结果，录入任一参数后才开始测算；有本地存档时直接恢复上次结果
 - **PWA 支持**：可添加到手机主屏幕，全屏独立运行，离线可用
 - **响应式布局**：桌面左右分栏、移动端上下堆叠，触摸友好
 
-## 🖼️ 界面预览
+## 🧱 技术栈
 
-> 截图位置（后续可替换为实际截图）
-
-- 桌面端：左侧参数设置，右侧 sticky 结果面板
-- 移动端：上下堆叠，滑块加大触摸热区
-- 对比表：冻结首列，支持横向滚动
+| 项 | 选择 |
+|---|---|
+| 框架 | Vue 3.5（Composition API + `<script setup>`） |
+| 构建 | Vite 7 |
+| PWA | vite-plugin-pwa（Workbox 生成 Service Worker） |
+| 样式 | 原生 CSS + 设计令牌（CSS 变量），无 UI 框架 |
+| 状态 | 单个 composable（`useLoanCalc`），无 Pinia |
+| 测试 | Node 内置 `node:test`，零测试依赖 |
+| 语言 | JavaScript（未使用 TypeScript） |
 
 ## 📦 项目结构
 
 ```
 mortgage-calculator/
-├── index.html        # 主程序（CSS + JS 全部内联，单文件即可运行）
-├── manifest.json     # PWA 清单文件
-├── sw.js             # Service Worker 离线缓存
-├── icon-192.png      # PWA 图标 192×192
-├── icon-512.png      # PWA 图标 512×512
-└── README.md         # 项目说明
+├── index.html                 # Vite 入口（仅保留 meta 与挂载点）
+├── vite.config.js             # 构建 + PWA 配置（base: './'）
+├── package.json
+├── public/                    # 原样拷贝到 dist 根目录
+│   ├── manifest.json
+│   ├── icon-192.png
+│   └── icon-512.png
+├── src/
+│   ├── main.js                # 挂载应用 + 引入全局样式
+│   ├── App.vue                # 三区块布局与事件接线
+│   ├── core/                  # 框架无关的纯逻辑（可单测）
+│   │   ├── constants.js       # 默认值、存储键、对比字段定义
+│   │   ├── calc.js            # 计算引擎（等额本息/等额本金/公积金冲抵）
+│   │   ├── storage.js         # localStorage 读写与容错
+│   │   └── format.js          # 金额、百分比格式化
+│   ├── composables/
+│   │   └── useLoanCalc.js     # 响应式状态 + 自动持久化 + 对比列表操作
+│   ├── components/
+│   │   ├── ui/                # 原子组件：卡片、滑块、数字输入、分段控件、快捷按钮
+│   │   ├── business/          # 业务区块：收入、房屋首付、贷款方案、结果面板
+│   │   └── compare/           # 对比表、对比区、全屏转置弹窗
+│   ├── styles/
+│   │   └── global.css         # 设计令牌（颜色/圆角/阴影）+ 基础样式
+│   └── utils/
+│       └── csv.js             # CSV 生成与下载
+└── tests/                     # 计算引擎与存储层单元测试
 ```
 
 ## 🚀 快速开始
 
-### 本地运行
-
-直接双击 `index.html` 即可在浏览器中打开使用，无需任何构建工具、无需安装依赖。
-
 ```bash
-# 或者用本地服务器启动（推荐，PWA 功能完整）
-cd mortgage-calculator
-python3 -m http.server 8000
-# 浏览器访问 http://localhost:8000
+# 安装依赖（Node 20.19+ / 22.12+）
+npm install
+
+# 开发（热更新）
+npm run dev          # http://localhost:5173
+
+# 生产构建，产物在 dist/
+npm run build
+
+# 本地预览构建产物
+npm run preview
+
+# 运行单元测试（Node 内置 test runner）
+npm test
 ```
 
+> ⚠️ 迁移到 Vite 后，不能再通过「双击 `index.html`」运行，请使用上面的 `npm run dev` 或 `npm run build` + 静态服务器。
 
-### 部署到其他静态托管
+## ☁️ 部署
 
-支持任意静态网站托管平台：
+仓库已内置 GitHub Actions（`.github/workflows/static.yml`）：
 
-- 腾讯云 EdgeOne Pages
-- CloudBase 静态网站
-- Vercel / Netlify（国内访问可能较慢）
+```
+push 到 master → npm ci → npm run build → 上传 dist/ 到 GitHub Pages
+```
 
-上传整个目录或仅 `index.html` 即可。
+部署到其他静态托管平台时，**上传 `dist/` 目录**即可（腾讯云 EdgeOne Pages、CloudBase、Vercel、Netlify 等）。
+
+`vite.config.js` 中 `base: './'` 使用相对路径，因此部署到任意子路径（例如 `https://example.com/mortgage/`）都能正常加载资源。
 
 ### 安装到手机（PWA）
 
-用 Chrome 浏览器打开网页 → 菜单 ⋮ → **添加到主屏幕**，即可像 App 一样全屏使用。
+用手机浏览器打开线上地址 → 浏览器菜单 → **添加到主屏幕**。Service Worker 会自动缓存构建产物，首次打开后可离线使用。
+
+## 🔁 数据兼容
+
+升级没有改变本地存储格式：
+
+- `loan_calc_setting`：参数配置
+- `loan_calc_compare`：对比方案列表
+
+字段名与旧版完全一致（对比项的还款方式仍存中文「等额本息 / 等额本金」），**从 1.x 升级不会丢失已保存的方案**。
 
 ## 🧮 计算说明
 
@@ -83,13 +126,26 @@ python3 -m http.server 8000
 - **公积金冲抵模型**：优先冲抵公积金贷款月供，剩余部分冲抵商业贷款月供；若公积金月缴存额大于总月供，则全部覆盖
 - **利率口径**：商贷利率 = LPR + 加点（bp 换算为百分点，1bp = 0.01%）
 
-## ⚠️ 免责声明
+计算引擎位于 `src/core/calc.js`，为纯函数、无 DOM 依赖，并有 24 条单元测试覆盖（含 0 利率、0 本金等边界）。
 
-- 本工具所有计算结果**仅供参考**，实际月供、利息以银行最终核算为准
-- 公积金冲抵逻辑为简化模型，各地公积金政策不同（按月冲、按年冲、异地使用等），请以当地公积金中心规定为准
-- 工具不会上传任何数据，所有计算与存储均在你的浏览器本地完成
+## ⚠️ 已知限制
+
+- **贷款类型切换为纯展示**：顶部「组合贷款 / 商业贷款 / 公积金贷款」标签沿用旧版行为，仅切换高亮，不改变金额拆分。若需要「选商业贷款时自动把公积金归零」这类语义，需另行实现。
+- 公积金冲抵为简化模型，未区分按月冲/按年冲/异地使用等地方政策。
 
 ## 📝 更新日志
+
+### v2.0.0
+
+- **技术栈迁移**：原生 JS 单文件 → Vue 3 + Vite 工程化
+- **组件化**：拆分为 5 个原子组件、6 个业务组件、3 个对比组件
+- **设计系统**：统一 CSS 令牌，重做按钮/滑块/输入框/分段控件交互与视觉
+- **结果面板增强**：等额本金显示首月/末月，新增总利息，占比超 50% 预警配色
+- **计算引擎抽离**：`src/core/*` 纯函数 + 24 条单元测试
+- **Bug 修复**：
+    - 利率为 0 时等额本息月供变成 `NaN`
+    - 输入框可能渲染出 `undefined` 文本
+- **PWA 升级**：由手写 `sw.js` 改为 Workbox 生成，自动处理带哈希的构建产物
 
 ### v1.0.0
 
@@ -100,6 +156,12 @@ python3 -m http.server 8000
 - localStorage 持久化
 - PWA 离线支持
 - 移动端适配
+
+## ⚠️ 免责声明
+
+- 本工具所有计算结果**仅供参考**，实际月供、利息以银行最终核算为准
+- 公积金冲抵逻辑为简化模型，各地公积金政策不同（按月冲、按年冲、异地使用等），请以当地公积金中心规定为准
+- 工具不会上传任何数据，所有计算与存储均在你的浏览器本地完成
 
 ## 📄 License
 

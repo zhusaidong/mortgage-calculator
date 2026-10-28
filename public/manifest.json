@@ -2,7 +2,7 @@
   "name": "房贷计算器-组合贷税后公积金版",
   "short_name": "房贷计算器",
   "description": "离线房贷组合贷款计算器，支持税后工资、公积金冲抵、方案对比",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f5f7fa",
