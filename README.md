@@ -61,15 +61,6 @@ python3 -m http.server 8000
 # 浏览器访问 http://localhost:8000
 ```
 
-### 部署到 Gitee Pages
-
-1. Fork 本仓库到你自己的 Gitee 账号
-2. 进入仓库 → **服务** → **Gitee Pages**
-3. 部署分支选 `master`，目录填 `/`
-4. 点击「启动」，等待部署完成
-5. 访问生成的 `https://你的用户名.gitee.io/仓库名/` 即可
-
-> ⚠️ Gitee Pages 需要账号实名认证，且仓库必须开源。
 
 ### 部署到其他静态托管
 
