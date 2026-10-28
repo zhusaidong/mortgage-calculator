@@ -1,37 +1,115 @@
-# Mortgage Calculator
+# 房贷组合贷计算器
 
-#### 介绍
-房贷计算器
+> 一个纯前端、离线可用的房贷计算工具，支持商业贷款、公积金贷款、组合贷款，多方案横向对比，数据本地存储。
 
-#### 软件架构
-软件架构说明
+[![](https://img.shields.io/badge/-HTML5-orange.svg)]()
+[![](https://img.shields.io/badge/-CSS3-blue.svg)]()
+[![](https://img.shields.io/badge/-JavaScript-yellow.svg)]()
+[![](https://img.shields.io/badge/license-MIT-green.svg)]()
 
+## 🌟 功能特性
 
-#### 安装教程
+- **三种贷款类型**：纯商业贷款、纯公积金贷款、组合贷款（商贷+公积金自动拆分）
+- **两种还款方式**：等额本息、等额本金，实时切换
+- **智能输入**：
+    - 房屋总价 + 首付比例滑块联动，自动算出首付金额与贷款总额
+    - 首付比例快捷按钮：15% / 20% / 30% / 40% / 50%
+    - 贷款年限快捷按钮：10 / 15 / 20 / 25 / 30 年
+    - LPR 加点快捷选项：-60bp / -45bp / -30bp / 0bp / +20bp
+- **收入与公积金**：
+    - 输入税后月工资、每月公积金缴存额
+    - 自动计算公积金冲抵后的实际自付月供
+    - 自动计算月供占税后收入比例
+- **方案对比**：
+    - 一键加入对比列表，多方案横向比较
+    - 横屏查看模式：转置竖表格（项目在左，方案在右）
+    - 支持导出 CSV 文件
+- **数据持久化**：所有配置与对比列表自动保存到浏览器 `localStorage`，刷新不丢失
+- **PWA 支持**：可添加到手机主屏幕，全屏独立运行，离线可用
+- **响应式布局**：桌面左右分栏、移动端上下堆叠，触摸友好
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 🖼️ 界面预览
 
-#### 使用说明
+> 截图位置（后续可替换为实际截图）
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- 桌面端：左侧参数设置，右侧 sticky 结果面板
+- 移动端：上下堆叠，滑块加大触摸热区
+- 对比表：冻结首列，支持横向滚动
 
-#### 参与贡献
+## 📦 项目结构
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+```
+mortgage-calculator/
+├── index.html        # 主程序（CSS + JS 全部内联，单文件即可运行）
+├── manifest.json     # PWA 清单文件
+├── sw.js             # Service Worker 离线缓存
+├── icon-192.png      # PWA 图标 192×192
+├── icon-512.png      # PWA 图标 512×512
+└── README.md         # 项目说明
+```
 
+## 🚀 快速开始
 
-#### 特技
+### 本地运行
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+直接双击 `index.html` 即可在浏览器中打开使用，无需任何构建工具、无需安装依赖。
+
+```bash
+# 或者用本地服务器启动（推荐，PWA 功能完整）
+cd mortgage-calculator
+python3 -m http.server 8000
+# 浏览器访问 http://localhost:8000
+```
+
+### 部署到 Gitee Pages
+
+1. Fork 本仓库到你自己的 Gitee 账号
+2. 进入仓库 → **服务** → **Gitee Pages**
+3. 部署分支选 `master`，目录填 `/`
+4. 点击「启动」，等待部署完成
+5. 访问生成的 `https://你的用户名.gitee.io/仓库名/` 即可
+
+> ⚠️ Gitee Pages 需要账号实名认证，且仓库必须开源。
+
+### 部署到其他静态托管
+
+支持任意静态网站托管平台：
+
+- 腾讯云 EdgeOne Pages
+- CloudBase 静态网站
+- Vercel / Netlify（国内访问可能较慢）
+
+上传整个目录或仅 `index.html` 即可。
+
+### 安装到手机（PWA）
+
+用 Chrome 浏览器打开网页 → 菜单 ⋮ → **添加到主屏幕**，即可像 App 一样全屏使用。
+
+## 🧮 计算说明
+
+- **等额本息**：每月还款额固定，月供 = 本金 × 月利率 × (1+月利率)^期数 / [(1+月利率)^期数 - 1]
+- **等额本金**：每月本金固定，利息逐月递减，首月月供最高，末月月供最低
+- **公积金冲抵模型**：优先冲抵公积金贷款月供，剩余部分冲抵商业贷款月供；若公积金月缴存额大于总月供，则全部覆盖
+- **利率口径**：商贷利率 = LPR + 加点（bp 换算为百分点，1bp = 0.01%）
+
+## ⚠️ 免责声明
+
+- 本工具所有计算结果**仅供参考**，实际月供、利息以银行最终核算为准
+- 公积金冲抵逻辑为简化模型，各地公积金政策不同（按月冲、按年冲、异地使用等），请以当地公积金中心规定为准
+- 工具不会上传任何数据，所有计算与存储均在你的浏览器本地完成
+
+## 📝 更新日志
+
+### v1.0.0
+
+- 基础组合贷计算
+- 滑块 + 快捷按钮交互
+- 税后工资与公积金冲抵
+- 方案对比 + CSV 导出
+- localStorage 持久化
+- PWA 离线支持
+- 移动端适配
+
+## 📄 License
+
+MIT License，可自由修改与自用。
