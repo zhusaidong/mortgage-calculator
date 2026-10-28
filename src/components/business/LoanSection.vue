@@ -12,16 +12,16 @@
         v-model="settings.fundAmt"
         label="公积金贷款（万元）"
         :min="0"
-        :max="500"
+        :max="fundMaxW"
         :step="1"
         unit="万"
-        :value-text="`${settings.fundAmt} 万`"
+        :value-text="`${result.fundW} 万`"
       />
     </div>
 
     <div class="amount-grid">
       <NumberField label="商业贷款（万元）" unit="万" readonly :model-value="ready ? result.comW.toFixed(2) : ''" />
-      <NumberField label="公积金贷款（万元）" unit="万" readonly :model-value="ready ? settings.fundAmt.toFixed(2) : ''" />
+      <NumberField label="公积金贷款（万元）" unit="万" readonly :model-value="ready ? result.fundW.toFixed(2) : ''" />
     </div>
 
     <div class="divider" />
@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import SectionCard from '../ui/SectionCard.vue'
 import SliderField from '../ui/SliderField.vue'
 import NumberField from '../ui/NumberField.vue'
@@ -48,6 +49,8 @@ const props = defineProps({
 })
 
 defineEmits(['update:loanType'])
+
+const fundMaxW = computed(() => Math.max(0, Math.min(500, Math.floor(props.result.totalLoanW))))
 
 // 直接改 props.settings.housePrice —— 该对象来自 reactive()，改动会触发全链重算。
 // 这是有意为之的共享状态写法，不要改成 emit 逐字段回传。

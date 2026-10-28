@@ -126,6 +126,35 @@ test('公积金冲抵: 完全覆盖 / 部分覆盖 / 超额', () => {
   assert.ok(over.selfPay >= 0)
 })
 
+test('公积金贷款超过贷款总额时按总额封顶，不放大利息', () => {
+  const settings = { ...COMBO_SETTINGS, housePrice: 100, downRate: 15, fundAmt: 500 }
+  const res = computeResult(settings)
+
+  assert.equal(res.totalLoanW, 85)
+  assert.equal(res.fundW, 85)
+  assert.equal(res.comW, 0)
+  closeTo(res.origin, calcLoan(85, settings.loanYear, settings.fundRate, settings.payMode).monthly, 1e-12)
+
+  const uncappedMonthly = calcLoan(500, settings.loanYear, settings.fundRate, settings.payMode).monthly
+  assert.ok(res.origin < uncappedMonthly)
+})
+
+test('公积金贷款为负数时归零，商贷不被放大', () => {
+  const res = computeResult({ ...COMBO_SETTINGS, fundAmt: -100 })
+
+  assert.equal(res.fundW, 0)
+  assert.equal(res.comW, res.totalLoanW)
+  closeTo(res.origin, calcLoan(res.totalLoanW, COMBO_SETTINGS.loanYear, res.comRate, COMBO_SETTINGS.payMode).monthly, 1e-12)
+})
+
+test('对比项的公积金金额取实际生效值', () => {
+  const settings = { ...COMBO_SETTINGS, housePrice: 100, downRate: 15, fundAmt: 500 }
+  const item = buildCompareItem(settings, computeResult(settings))
+  assert.equal(item.fund, 85)
+  assert.equal(item.com, 0)
+  assert.equal(item.loanTotal, 85)
+})
+
 test('salary = 0 时占比为 null', () => {
   const res = computeResult({ ...COMBO_SETTINGS, monthSalary: 0 })
   assert.equal(res.rateOrigin, null)

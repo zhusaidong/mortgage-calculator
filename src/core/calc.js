@@ -105,10 +105,12 @@ export function computeResult(settings = {}) {
 
   const totalLoanW = housePrice * (1 - downRate / 100)
   const downW = (housePrice * downRate) / 100
-  const comW = Math.max(0, totalLoanW - fundAmt)
+  // 公积金贷款不能超过贷款总额，也不能为负，否则月供会脱离房屋实际价值
+  const fundW = Math.min(Math.max(fundAmt, 0), Math.max(totalLoanW, 0))
+  const comW = Math.max(0, totalLoanW - fundW)
   const comRate = rateMode === RATE_MODE.LPR ? lprVal + bpVal / 100 : comRateDirect
 
-  const fundLoan = calcLoan(fundAmt, loanYear, fundRate, payMode)
+  const fundLoan = calcLoan(fundW, loanYear, fundRate, payMode)
   const comLoan = calcLoan(comW, loanYear, comRate, payMode)
   const fundMonthly = fundLoan.monthly
   const comMonthly = comLoan.monthly
@@ -131,7 +133,7 @@ export function computeResult(settings = {}) {
     totalLoanW,
     downW,
     comW,
-    fundW: fundAmt,
+    fundW,
     comMonthly,
     fundMonthly,
     origin,
@@ -163,7 +165,7 @@ export function buildCompareItem(settings, result) {
     downRate: round2Value(s.downRate),
     down: round2Value(result.downW),
     loanTotal: round2Value(result.totalLoanW),
-    fund: round2Value(s.fundAmt),
+    fund: round2Value(result.fundW),
     com: round2Value(result.comW),
     year: round2Value(s.loanYear),
     payType,

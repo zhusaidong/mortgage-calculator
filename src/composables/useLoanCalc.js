@@ -27,6 +27,14 @@ export function useLoanCalc() {
     { deep: true }
   )
 
+  // 房价或首付变化后总贷款可能变小，公积金输入停在旧值会让滑块与计算结果不一致，这里同步收敛
+  watch(
+    () => result.value.totalLoanW,
+    (total) => {
+      if (settings.fundAmt > total) settings.fundAmt = Math.max(0, Math.floor(total))
+    }
+  )
+
   function addToCompare() {
     if (!ready.value) return
     compareList.value.push(buildCompareItem(settings, result.value))
