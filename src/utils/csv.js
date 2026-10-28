@@ -10,12 +10,11 @@ export const CSV_HEADERS = [
   '还款方式',
   '商贷利率',
   '公积金利率',
-  '税后月收入',
-  '月公积金',
   '原月供(元)',
   '抵扣后自付(元)',
   '原月供占税后',
   '自付占税后',
+  '银行偿贷比',
   '总利息(万)'
 ]
 
@@ -49,12 +48,11 @@ export function buildCompareCsv(items) {
         plainCell(item.payType),
         percentCell(item.comRate),
         percentCell(item.fundRate),
-        plainCell(item.salary),
-        plainCell(item.gjjMonth),
         plainCell(item.originPay),
         plainCell(item.selfPay),
         percentCell(item.rateOrigin),
         percentCell(item.rateSelf),
+        percentCell(item.ratePreTax),
         plainCell(item.totalInt)
       ].join(',')
     )

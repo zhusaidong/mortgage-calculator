@@ -1,39 +1,41 @@
 <template>
-  <label class="number-field" :class="{ 'is-readonly': readonly }">
+  <label :class="{ 'is-readonly': readonly }" class="number-field">
     <span v-if="label" class="nf-label">{{ label }}</span>
+    <span v-if="labelTip" class="nf-label-tip">{{ labelTip }}</span>
     <span class="nf-control">
       <input
-        class="nf-input"
-        :class="{ 'has-unit': unit }"
-        type="number"
-        :value="modelValue"
-        :step="step"
-        :min="min"
-        :max="max"
-        :readonly="readonly"
-        :placeholder="placeholder"
-        :inputmode="inputmode"
-        :aria-label="ariaLabel || undefined"
-        @input="onInput"
+          :aria-label="ariaLabel || undefined"
+          :class="{ 'has-unit': unit }"
+          :inputmode="inputmode"
+          :max="max"
+          :min="min"
+          :placeholder="placeholder"
+          :readonly="readonly"
+          :step="step"
+          :value="modelValue"
+          class="nf-input"
+          type="number"
+          @input="onInput"
       />
-      <span v-if="unit" class="nf-unit" aria-hidden="true">{{ unit }}</span>
+      <span v-if="unit" aria-hidden="true" class="nf-unit">{{ unit }}</span>
     </span>
   </label>
 </template>
 
 <script setup>
 defineProps({
-  modelValue: { type: [Number, String], default: '' },
-  label: { type: String, default: '' },
-  unit: { type: String, default: '' },
-  step: { type: [Number, String], default: 'any' },
-  min: { type: [Number, String], default: undefined },
-  max: { type: [Number, String], default: undefined },
-  readonly: { type: Boolean, default: false },
-  placeholder: { type: String, default: '' },
-  inputmode: { type: String, default: 'decimal' },
+  modelValue: {type: [Number, String], default: ''},
+  label: {type: String, default: ''},
+  labelTip: {type: String, default: ''},
+  unit: {type: String, default: ''},
+  step: {type: [Number, String], default: 'any'},
+  min: {type: [Number, String], default: undefined},
+  max: {type: [Number, String], default: undefined},
+  readonly: {type: Boolean, default: false},
+  placeholder: {type: String, default: ''},
+  inputmode: {type: String, default: 'decimal'},
   // 当字段旁已有独立的视觉标签、本组件不显示 label 时，用它保证可访问名称
-  ariaLabel: { type: String, default: '' }
+  ariaLabel: {type: String, default: ''}
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -54,6 +56,14 @@ function onInput(event) {
   margin-bottom: 6px;
   color: var(--c-text-2);
   font-size: 14px;
+  font-weight: 500;
+}
+
+.nf-label-tip {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--c-text-2);
+  font-size: 10px;
   font-weight: 500;
 }
 

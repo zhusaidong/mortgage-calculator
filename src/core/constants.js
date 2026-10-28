@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS = {
   comRateDirect: 3.05,
   fundRate: 2.6,
   monthSalary: 0,
+  monthPreTaxSalary: 0,
   monthGjj: 0,
   rateMode: RATE_MODE.LPR,
   payMode: PAY_TYPE.INTEREST
@@ -42,14 +43,13 @@ export const COMPARE_FIELDS = [
   ['payType', '还款方式'],
   ['comRate', '商贷利率'],
   ['fundRate', '公积金利率'],
-  ['salary', '税后月收入'],
-  ['gjjMonth', '月公积金'],
   ['originPay', '原月供/首月(元)'],
   ['selfPay', '抵扣后自付(元)'],
   ['rateOrigin', '原月供占税后'],
   ['rateSelf', '自付占税后'],
+  ['ratePreTax', '银行偿贷比'],
   ['totalInt', '总利息(万)']
 ]
 
 // 对比表中按百分比展示的字段
-export const PERCENT_FIELDS = ['downRate', 'comRate', 'fundRate', 'rateOrigin', 'rateSelf']
+export const PERCENT_FIELDS = ['downRate', 'comRate', 'fundRate', 'rateOrigin', 'rateSelf', 'ratePreTax']

@@ -7,6 +7,7 @@ export default defineConfig(({mode}) => {
     const isSingle = mode === 'single'
 
     return {
+        base: './',
         plugins: [
             vue(),
             // 只有 mode=single 才开启单文件插件

@@ -138,6 +138,25 @@ test('salary > 0 时占比按税后收入计算', () => {
   closeTo(res.rateSelf, (res.selfPay / 30000) * 100, 1e-12)
 })
 
+test('税前收入决定银行偿贷比，且以原月供为准', () => {
+  const res = computeResult({ ...COMBO_SETTINGS, monthPreTaxSalary: 40000 })
+  closeTo(res.ratePreTax, (res.origin / 40000) * 100, 1e-12)
+  assert.ok(res.ratePreTax < res.rateOrigin)
+  assert.ok(res.ratePreTax > res.rateSelf)
+})
+
+test('未填税前收入时 bankRatio 为 null', () => {
+  assert.equal(computeResult(COMBO_SETTINGS).ratePreTax, null)
+  assert.equal(computeResult({ ...COMBO_SETTINGS, monthPreTaxSalary: -1 }).ratePreTax, null)
+})
+
+test('bankRatio 与税前收入无关，只取决于月供', () => {
+  const low = computeResult({ ...COMBO_SETTINGS, monthPreTaxSalary: 20000 })
+  const high = computeResult({ ...COMBO_SETTINGS, monthPreTaxSalary: 80000 })
+  assert.ok(low.ratePreTax > high.ratePreTax)
+  assert.equal(low.origin, high.origin)
+})
+
 test('等额本金模式下 origin 取首月月供', () => {
   const res = computeResult({ ...COMBO_SETTINGS, payMode: PAY_TYPE.PRINCIPAL })
   assert.equal(res.fundLoan.lastMonth < res.fundLoan.monthly, true)
@@ -158,8 +177,8 @@ test('buildCompareItem 字段与中文 payType', () => {
   const item = buildCompareItem(COMBO_SETTINGS, res)
   assert.deepEqual(Object.keys(item), [
     'housePrice', 'downRate', 'down', 'loanTotal', 'fund', 'com', 'year', 'payType',
-    'comRate', 'fundRate', 'salary', 'gjjMonth', 'originPay', 'selfPay',
-    'rateOrigin', 'rateSelf', 'totalInt'
+    'comRate', 'fundRate', 'originPay', 'selfPay',
+    'rateOrigin', 'rateSelf', 'ratePreTax', 'totalInt'
   ])
   assert.equal(item.payType, '等额本息')
   assert.equal(item.down, 45)
@@ -167,6 +186,11 @@ test('buildCompareItem 字段与中文 payType', () => {
   assert.equal(item.com, 195)
   assert.equal(item.originPay, round2(res.origin))
   assert.equal(typeof item.rateOrigin, 'number')
+  assert.equal(item.ratePreTax, '--')
+
+  for (const sensitive of ['salary', 'preTaxSalary', 'gjjMonth']) {
+    assert.equal(sensitive in item, false, `对比项不应包含敏感字段 ${sensitive}`)
+  }
 
   const principal = buildCompareItem({ ...COMBO_SETTINGS, payMode: PAY_TYPE.PRINCIPAL }, computeResult({ ...COMBO_SETTINGS, payMode: PAY_TYPE.PRINCIPAL }))
   assert.equal(principal.payType, '等额本金')
@@ -174,6 +198,9 @@ test('buildCompareItem 字段与中文 payType', () => {
   const noSalary = buildCompareItem({ ...COMBO_SETTINGS, monthSalary: 0 }, computeResult({ ...COMBO_SETTINGS, monthSalary: 0 }))
   assert.equal(noSalary.rateOrigin, '--')
   assert.equal(noSalary.rateSelf, '--')
+
+  const withPreTax = buildCompareItem({ ...COMBO_SETTINGS, monthPreTaxSalary: 40000 }, computeResult({ ...COMBO_SETTINGS, monthPreTaxSalary: 40000 }))
+  assert.equal(typeof withPreTax.ratePreTax, 'number')
 })
 
 test('format 工具', () => {

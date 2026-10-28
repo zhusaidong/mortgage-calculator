@@ -11,7 +11,7 @@
       <tbody>
         <template v-if="!items.length">
           <tr>
-            <td colspan="19" class="empty-tip">暂无对比方案，请添加</td>
+            <td colspan="18" class="empty-tip">暂无对比方案，请添加</td>
           </tr>
         </template>
         <template v-else>
@@ -51,12 +51,11 @@ const DATA_COLUMNS = [
   { key: 'payType', label: '还款方式', align: 'center' },
   { key: 'comRate', label: '商贷利率', percent: true },
   { key: 'fundRate', label: '公积金利率', percent: true },
-  { key: 'salary', label: '税后月收入' },
-  { key: 'gjjMonth', label: '月公积金' },
   { key: 'originPay', label: '原月供(元)' },
   { key: 'selfPay', label: '抵扣后自付(元)' },
   { key: 'rateOrigin', label: '原月供占税后', percent: true },
   { key: 'rateSelf', label: '自付占税后', percent: true },
+  { key: 'ratePreTax', label: '银行偿贷比', percent: true },
   { key: 'totalInt', label: '总利息(万)' }
 ]
 

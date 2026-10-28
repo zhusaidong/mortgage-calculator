@@ -110,6 +110,7 @@ test('saveSettings / loadSettings 往返一致且只写业务字段', () => {
     comRateDirect: DEFAULT_SETTINGS.comRateDirect,
     fundRate: DEFAULT_SETTINGS.fundRate,
     monthSalary: DEFAULT_SETTINGS.monthSalary,
+    monthPreTaxSalary: DEFAULT_SETTINGS.monthPreTaxSalary,
     monthGjj: DEFAULT_SETTINGS.monthGjj,
     rateMode: RATE_MODE.DIRECT,
     payMode: PAY_TYPE.PRINCIPAL

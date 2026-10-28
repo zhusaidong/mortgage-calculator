@@ -92,12 +92,11 @@ const ORIGINAL_COLUMNS = [
   { key: 'payType', label: '还款方式', align: 'center' },
   { key: 'comRate', label: '商贷利率' },
   { key: 'fundRate', label: '公积金利率' },
-  { key: 'salary', label: '税后月收入' },
-  { key: 'gjjMonth', label: '月公积金' },
   { key: 'originPay', label: '原月供(元)' },
   { key: 'selfPay', label: '抵扣后自付(元)' },
   { key: 'rateOrigin', label: '原月供占税后' },
   { key: 'rateSelf', label: '自付占税后' },
+  { key: 'ratePreTax', label: '银行偿贷比' },
   { key: 'totalInt', label: '总利息(万)' }
 ]
 

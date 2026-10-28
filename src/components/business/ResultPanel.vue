@@ -39,13 +39,19 @@
             {{ fmtPercent(result.rateSelf, 1) }}
           </span>
         </div>
-        <p v-if="!hasSalary" class="ratio-hint">未填写收入</p>
+        <div class="info-line">
+          <span>银行偿贷比（月供/税前）</span>
+          <span class="info-value" :class="{ 'is-warn': warnPreTax }">
+            {{ fmtPercent(result.ratePreTax, 1) }}
+          </span>
+        </div>
+        <p v-if="ratioHint" class="ratio-hint" :class="{ 'is-warn': warnPreTax }">{{ ratioHint }}</p>
       </div>
 
       <button class="btn btn-primary add-btn" type="button" @click="emit('add')">+ 加入对比</button>
 
       <p class="result-note">
-        公积金冲抵为估算模型：优先冲公积金月供，剩余冲商贷；各地公积金政策不同，仅预算参考。收入占比基于税后到手工资。配置与对比方案自动本地保存。
+        公积金冲抵为估算模型：优先冲公积金月供，剩余冲商贷；各地公积金政策不同，仅预算参考。银行偿贷比按税前月收入计算，仅作审批参考。
       </p>
     </template>
   </SectionCard>
@@ -75,9 +81,19 @@ const lastMonthTotal = computed(() => {
 })
 
 const hasSalary = computed(() => Number(props.settings.monthSalary) > 0)
+const hasPreTaxSalary = computed(() => Number(props.settings.monthPreTaxSalary) > 0)
 
 const warnOrigin = computed(() => typeof props.result.rateOrigin === 'number' && props.result.rateOrigin >= 50)
 const warnSelf = computed(() => typeof props.result.rateSelf === 'number' && props.result.rateSelf >= 50)
+const warnPreTax = computed(() => typeof props.result.ratePreTax === 'number' && props.result.ratePreTax >= 50)
+
+const ratioHint = computed(() => {
+  if (warnPreTax.value) return '银行偿贷比超过 50%，可能影响贷款审批'
+  if (!hasSalary.value && !hasPreTaxSalary.value) return '填写收入后可查看占比'
+  if (!hasSalary.value) return '未填写税后收入'
+  if (!hasPreTaxSalary.value) return '未填写税前收入'
+  return ''
+})
 </script>
 
 <style scoped>
@@ -144,6 +160,10 @@ const warnSelf = computed(() => typeof props.result.rateSelf === 'number' && pro
   font-size: 12px;
   color: var(--c-text-3);
   text-align: right;
+}
+
+.ratio-hint.is-warn {
+  color: var(--c-warning);
 }
 
 .add-btn {

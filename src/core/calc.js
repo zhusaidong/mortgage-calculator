@@ -95,6 +95,7 @@ export function computeResult(settings = {}) {
   const comRateDirect = finiteOr(s.comRateDirect, DEFAULT_SETTINGS.comRateDirect)
   const fundRate = finiteOr(s.fundRate, DEFAULT_SETTINGS.fundRate)
   const monthSalary = finiteOr(s.monthSalary, DEFAULT_SETTINGS.monthSalary)
+  const monthPreTaxSalary = finiteOr(s.monthPreTaxSalary, DEFAULT_SETTINGS.monthPreTaxSalary)
   const monthGjj = finiteOr(s.monthGjj, DEFAULT_SETTINGS.monthGjj)
   const payMode = s.payMode === PAY_TYPE.PRINCIPAL ? PAY_TYPE.PRINCIPAL : PAY_TYPE.INTEREST
   const rateMode =
@@ -122,6 +123,7 @@ export function computeResult(settings = {}) {
 
   const rateOrigin = monthSalary > 0 ? (origin / monthSalary) * 100 : null
   const rateSelf = monthSalary > 0 ? (selfPay / monthSalary) * 100 : null
+  const ratePreTax = monthPreTaxSalary > 0 ? (origin / monthPreTaxSalary) * 100 : null
   const totalInterestW = (fundLoan.totalInt + comLoan.totalInt) / WAN
 
   return {
@@ -138,6 +140,7 @@ export function computeResult(settings = {}) {
     selfPay,
     rateOrigin,
     rateSelf,
+    ratePreTax,
     totalInterestW,
     fundLoan,
     comLoan,
@@ -166,12 +169,11 @@ export function buildCompareItem(settings, result) {
     payType,
     comRate: round2Value(result.comRate),
     fundRate: round2Value(s.fundRate),
-    salary: round2Value(s.monthSalary),
-    gjjMonth: round2Value(s.monthGjj),
     originPay: round2Value(result.origin),
     selfPay: round2Value(result.selfPay),
     rateOrigin: result.rateOrigin === null || result.rateOrigin === undefined ? '--' : round2Value(result.rateOrigin),
     rateSelf: result.rateSelf === null || result.rateSelf === undefined ? '--' : round2Value(result.rateSelf),
+    ratePreTax: result.ratePreTax === null || result.ratePreTax === undefined ? '--' : round2Value(result.ratePreTax),
     totalInt: round2Value(result.totalInterestW)
   }
 }
