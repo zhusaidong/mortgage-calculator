@@ -31,15 +31,15 @@
 
 ## 🧱 技术栈
 
-| 项 | 选择 |
-|---|---|
-| 框架 | Vue 3.5（Composition API + `<script setup>`） |
-| 构建 | Vite 7 |
-| PWA | vite-plugin-pwa（Workbox 生成 Service Worker） |
-| 样式 | 原生 CSS + 设计令牌（CSS 变量），无 UI 框架 |
-| 状态 | 单个 composable（`useLoanCalc`），无 Pinia |
-| 测试 | Node 内置 `node:test`，零测试依赖 |
-| 语言 | JavaScript（未使用 TypeScript） |
+| 项   | 选择                                           |
+|------|------------------------------------------------|
+| 框架 | Vue 3.5（Composition API + `<script setup>`）  |
+| 构建 | Vite 7                                         |
+| PWA  | vite-plugin-pwa（Workbox 生成 Service Worker） |
+| 样式 | 原生 CSS + 设计令牌（CSS 变量），无 UI 框架    |
+| 状态 | 单个 composable（`useLoanCalc`），无 Pinia     |
+| 测试 | Node 内置 `node:test`，零测试依赖              |
+| 语言 | JavaScript（未使用 TypeScript）                |
 
 ## 📦 项目结构
 
@@ -85,14 +85,15 @@ npm run dev          # http://localhost:5173
 # 生产构建，产物在 dist/
 npm run build
 
+# 单文件构建，产物在 dist-single/
+npm run build-single
+
 # 本地预览构建产物
 npm run preview
 
 # 运行单元测试（Node 内置 test runner）
 npm test
 ```
-
-> ⚠️ 迁移到 Vite 后，不能再通过「双击 `index.html`」运行，请使用上面的 `npm run dev` 或 `npm run build` + 静态服务器。
 
 ## ☁️ 部署
 
@@ -102,9 +103,9 @@ npm test
 push 到 master → npm ci → npm run build → 上传 dist/ 到 GitHub Pages
 ```
 
-部署到其他静态托管平台时，**上传 `dist/` 目录**即可（腾讯云 EdgeOne Pages、CloudBase、Vercel、Netlify 等）。
+部署到其他静态托管平台时， **上传 `dist/` 目录**即可（腾讯云 EdgeOne Pages、CloudBase、Vercel、Netlify 等）。
 
-`vite.config.js` 中 `base: './'` 使用相对路径，因此部署到任意子路径（例如 `https://example.com/mortgage/`）都能正常加载资源。
+`vite.config.js` 中 `base: './'` 使用相对路径，因此部署到任意子路径（例如 `https://example.com/mortgage/` ）都能正常加载资源。
 
 ### 安装到手机（PWA）
 
@@ -117,7 +118,7 @@ push 到 master → npm ci → npm run build → 上传 dist/ 到 GitHub Pages
 - `loan_calc_setting`：参数配置
 - `loan_calc_compare`：对比方案列表
 
-字段名与旧版完全一致（对比项的还款方式仍存中文「等额本息 / 等额本金」），**从 1.x 升级不会丢失已保存的方案**。
+字段名与旧版完全一致（对比项的还款方式仍存中文「等额本息 / 等额本金」）， **从 1.x 升级不会丢失已保存的方案**。
 
 ## 🧮 计算说明
 
@@ -159,7 +160,7 @@ push 到 master → npm ci → npm run build → 上传 dist/ 到 GitHub Pages
 
 ## ⚠️ 免责声明
 
-- 本工具所有计算结果**仅供参考**，实际月供、利息以银行最终核算为准
+- 本工具所有计算结果 **仅供参考**，实际月供、利息以银行最终核算为准
 - 公积金冲抵逻辑为简化模型，各地公积金政策不同（按月冲、按年冲、异地使用等），请以当地公积金中心规定为准
 - 工具不会上传任何数据，所有计算与存储均在你的浏览器本地完成
 
