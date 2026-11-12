@@ -3,6 +3,9 @@ import { PAY_TYPE, RATE_MODE, DEFAULT_SETTINGS } from './constants.js'
 const MONTHS_PER_YEAR = 12
 const WAN = 10000
 
+// 反解房价的测算上限：10000 万元（1 亿元）
+export const MAX_PRICE_W = 10000
+
 // 非有限数归零：旧版输入框可能产生 ''/undefined，导致 NaN 渗透进计算
 function finiteOrZero(value) {
   const n = Number(value)
@@ -144,10 +147,37 @@ export function computeResult(settings = {}) {
     rateSelf,
     ratePreTax,
     totalInterestW,
+    totalPayW: (fundLoan.totalPay + comLoan.totalPay) / WAN,
     fundLoan,
     comLoan,
     months: loanYear * MONTHS_PER_YEAR
   }
+}
+
+/**
+ * 反向测算：给定目标月供（元），求可承受的房屋总价（万元）
+ * 二分查找 50 次（约 1e-11 万元精度），依赖 origin 随房价单调不减。
+ * 测算上限 MAX_PRICE_W = 10000 万元（1 亿元）；目标超出上限时返回该上限。
+ * @param {number} targetMonthly 目标月供（元）
+ * @param {object} settings 结构同 DEFAULT_SETTINGS（housePrice 会被覆盖）
+ * @returns {number} 房屋总价上限（万元）；目标不可达时返回 0，超出测算上限时返回 MAX_PRICE_W
+ */
+export function solveMaxHousePrice(targetMonthly, settings = {}) {
+  const target = Number(targetMonthly)
+  if (!Number.isFinite(target) || target <= 0) return 0
+
+  const monthlyAt = (price) => computeResult({ ...settings, housePrice: price }).origin
+  if (monthlyAt(MAX_PRICE_W) < target) return MAX_PRICE_W
+
+  let lo = 0
+  let hi = MAX_PRICE_W
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2
+    if (monthlyAt(mid) <= target) lo = mid
+    else hi = mid
+  }
+  // 取可承受一侧，保证反解出的房价对应月供不超过目标
+  return lo
 }
 
 /**

@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { PAY_TYPE, RATE_MODE } from '../src/core/constants.js'
-import { calcLoan, computeResult, buildCompareItem } from '../src/core/calc.js'
+import { calcLoan, computeResult, buildCompareItem, solveMaxHousePrice, MAX_PRICE_W } from '../src/core/calc.js'
 import { fmtMoney, fmtMoneyPlain, fmtPercent, fmtWan, round2 } from '../src/core/format.js'
 
 const COMBO_SETTINGS = {
@@ -230,6 +230,48 @@ test('buildCompareItem 字段与中文 payType', () => {
 
   const withPreTax = buildCompareItem({ ...COMBO_SETTINGS, monthPreTaxSalary: 40000 }, computeResult({ ...COMBO_SETTINGS, monthPreTaxSalary: 40000 }))
   assert.equal(typeof withPreTax.ratePreTax, 'number')
+})
+
+test('totalPayW 等于总贷款 + 总利息', () => {
+  const res = computeResult(COMBO_SETTINGS)
+  closeTo(res.totalPayW, res.totalLoanW + res.totalInterestW, 1e-9)
+})
+
+test('solveMaxHousePrice 反解回原房价', () => {
+  const res = computeResult(COMBO_SETTINGS)
+  const solved = solveMaxHousePrice(res.origin, COMBO_SETTINGS)
+  assert.ok(Math.abs(solved - COMBO_SETTINGS.housePrice) <= 0.01, `反解房价=${solved}`)
+})
+
+test('solveMaxHousePrice 随目标月供单调不减', () => {
+  const low = solveMaxHousePrice(6000, COMBO_SETTINGS)
+  const high = solveMaxHousePrice(9000, COMBO_SETTINGS)
+  assert.ok(high >= low, `high=${high} low=${low}`)
+  assert.ok(high > low)
+})
+
+test('solveMaxHousePrice 非法目标月供返回 0', () => {
+  for (const bad of [0, -1, NaN, Infinity, -Infinity]) {
+    assert.equal(solveMaxHousePrice(bad, COMBO_SETTINGS), 0, `输入 ${bad}`)
+  }
+})
+
+test('solveMaxHousePrice 目标超出测算上限时返回 MAX_PRICE_W', () => {
+  assert.equal(MAX_PRICE_W, 10000)
+  assert.equal(solveMaxHousePrice(1e9, COMBO_SETTINGS), MAX_PRICE_W)
+})
+
+test('solveMaxHousePrice 尊重贷款年限：20 年可买房价低于 30 年', () => {
+  const p30 = solveMaxHousePrice(8000, COMBO_SETTINGS)
+  const p20 = solveMaxHousePrice(8000, { ...COMBO_SETTINGS, loanYear: 20 })
+  assert.ok(p20 < p30, `20年=${p20} 30年=${p30}`)
+})
+
+test('solveMaxHousePrice 反解结果的月供不超过目标', () => {
+  const target = 8000
+  const solved = solveMaxHousePrice(target, COMBO_SETTINGS)
+  const actual = computeResult({ ...COMBO_SETTINGS, housePrice: solved }).origin
+  assert.ok(actual <= target + 1e-6, `实际月供=${actual} 目标=${target}`)
 })
 
 test('format 工具', () => {

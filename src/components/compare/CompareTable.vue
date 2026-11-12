@@ -22,7 +22,13 @@
               :key="col.key"
               :class="col.percent || col.align === 'right' ? 'cell-num' : 'cell-text'"
             >
-              {{ cellText(item, col) }}
+              <span class="cell-val">{{ cellText(item, col) }}</span>
+              <span
+                v-if="isBest(item, col.key)"
+                class="best-badge"
+                title="最低值"
+                aria-label="最低值"
+              >最优</span>
             </td>
             <td class="col-action">
               <button class="btn btn-sm" type="button" @click="emit('remove', index)">删除</button>
@@ -35,7 +41,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   items: { type: Array, default: () => [] }
 })
 const emit = defineEmits(['remove'])
@@ -66,6 +74,35 @@ function cellText(item, col) {
     return Number.isFinite(Number(value)) ? `${value}%` : `${value}`
   }
   return value
+}
+
+// 三项「越低越优」的决策指标
+const BEST_KEYS = ['totalInt', 'originPay', 'selfPay']
+
+// '--' / null / undefined / 非数字一律视为无值，避免 Number(null) === 0 造成误判
+function toFinite(value) {
+  if (value === null || value === undefined || value === '--' || value === '') return null
+  const num = Number(value)
+  return Number.isFinite(num) ? num : null
+}
+
+// 仅当方案数 >= 2 时才计算最低值，否则返回空对象，不做任何标记
+const bestValues = computed(() => {
+  const result = {}
+  if (props.items.length < 2) return result
+  for (const key of BEST_KEYS) {
+    const nums = props.items.map((item) => toFinite(item[key])).filter((v) => v !== null)
+    if (nums.length) result[key] = Math.min(...nums)
+  }
+  return result
+})
+
+function isBest(item, key) {
+  if (!(key in bestValues.value)) return false
+  const value = toFinite(item[key])
+  if (value === null) return false
+  // 数值来自 toFixed(2) 舍入，用极小 epsilon 容忍浮点误差以正确识别并列
+  return Math.abs(value - bestValues.value[key]) < 1e-9
 }
 </script>
 
@@ -134,6 +171,21 @@ function cellText(item, col) {
 
 .cell-text {
   text-align: center;
+}
+
+.best-badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(15, 157, 118, .12);
+  background: color-mix(in srgb, var(--c-success) 12%, transparent);
+  color: var(--c-success);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 .compare-table tbody tr:hover td {

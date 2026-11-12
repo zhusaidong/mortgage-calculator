@@ -24,6 +24,10 @@
           <span>总利息</span>
           <span class="info-value">{{ result.totalInterestW.toFixed(2) }} 万</span>
         </div>
+        <div class="info-line">
+          <span>总还款</span>
+          <span class="info-value">{{ result.totalPayW.toFixed(2) }} 万</span>
+        </div>
       </div>
 
       <div class="result-ratios">
@@ -48,7 +52,21 @@
         <p v-if="ratioHint" class="ratio-hint" :class="{ 'is-warn': warnPreTax }">{{ ratioHint }}</p>
       </div>
 
+      <div v-if="verdicts.length" class="verdict-block">
+        <p class="verdict-title">偿还能力评估</p>
+        <div v-for="item in verdicts" :key="item.key" class="verdict-row">
+          <span class="verdict-mark" :class="`is-${item.level}`" aria-hidden="true">{{ MARK[item.level] }}</span>
+          <span class="verdict-label">{{ item.label }}</span>
+          <span class="verdict-value">{{ item.value }}</span>
+          <span class="verdict-text" :class="`is-${item.level}`">{{ item.text }}</span>
+        </div>
+      </div>
+
       <button class="btn btn-primary add-btn" type="button" @click="emit('add')">+ 加入对比</button>
+      <div class="tool-row">
+        <button class="btn afford-btn" type="button" @click="emit('affordability')">我能买多贵？</button>
+        <button class="btn compare-repay-btn" type="button" @click="emit('repayment-compare')">还款方式对比</button>
+      </div>
 
       <p class="result-note">
         公积金冲抵为估算模型：优先冲公积金月供，剩余冲商贷；各地公积金政策不同，仅预算参考。银行偿贷比按税前月收入计算，仅作审批参考。
@@ -68,7 +86,9 @@ const props = defineProps({
   ready: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['add'])
+const emit = defineEmits(['add', 'affordability', 'repayment-compare'])
+
+const MARK = { ok: '✓', warn: '!', danger: '✕' }
 
 const isEqualPrincipal = computed(() => props.settings.payMode === 'equalPrincipal')
 
@@ -93,6 +113,45 @@ const ratioHint = computed(() => {
   if (!hasSalary.value) return '未填写税后收入'
   if (!hasPreTaxSalary.value) return '未填写税前收入'
   return ''
+})
+
+// 阈值：银行审批以 50% 偿贷比为红线，正好 50% 视为达标；税后占比 40% 以下舒适，50% 以上压力偏大
+const verdicts = computed(() => {
+  const list = []
+  const rateOriginValue = props.result.rateOrigin
+  const ratePreTaxValue = props.result.ratePreTax
+
+  if (hasPreTaxSalary.value && typeof ratePreTaxValue === 'number') {
+    const over = ratePreTaxValue > 50
+    list.push({
+      key: 'preTax',
+      label: '银行偿贷比',
+      value: fmtPercent(ratePreTaxValue, 1),
+      level: over ? 'danger' : 'ok',
+      text: over ? '超过 50% 审批红线' : '低于 50% 审批红线'
+    })
+  }
+
+  if (hasSalary.value && typeof rateOriginValue === 'number') {
+    let level = 'ok'
+    let text = '舒适区间（<40%）'
+    if (rateOriginValue > 50) {
+      level = 'danger'
+      text = '压力较大（>50%）'
+    } else if (rateOriginValue >= 40) {
+      level = 'warn'
+      text = '偏紧（40%–50%）'
+    }
+    list.push({
+      key: 'origin',
+      label: '月供占税后',
+      value: fmtPercent(rateOriginValue, 1),
+      level,
+      text
+    })
+  }
+
+  return list
 })
 </script>
 
@@ -166,11 +225,89 @@ const ratioHint = computed(() => {
   color: var(--c-warning);
 }
 
+.verdict-block {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--c-border-soft);
+}
+
+.verdict-title {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--c-text-3);
+}
+
+.verdict-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.verdict-mark {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.verdict-mark.is-ok,
+.verdict-text.is-ok {
+  color: var(--c-success);
+}
+
+.verdict-mark.is-warn,
+.verdict-text.is-warn {
+  color: var(--c-warning);
+}
+
+.verdict-mark.is-danger,
+.verdict-text.is-danger {
+  color: var(--c-danger);
+}
+
+.verdict-label {
+  color: var(--c-text-2);
+}
+
+.verdict-value {
+  color: var(--c-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.verdict-text {
+  font-size: 12px;
+}
+
 .add-btn {
   width: 100%;
   margin-top: 14px;
   min-height: 40px;
   font-size: 15px;
+}
+
+.afford-btn {
+  width: 100%;
+  min-height: 38px;
+  font-size: 14px;
+}
+
+.tool-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tool-row .btn {
+  flex: 1;
+  min-width: 0;
+  min-height: 38px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: 14px;
 }
 
 .result-note {

@@ -14,7 +14,14 @@
       </main>
 
       <aside class="pane-right">
-        <ResultPanel :settings="settings" :result="result" :ready="ready" @add="addToCompare" />
+        <ResultPanel
+          :settings="settings"
+          :result="result"
+          :ready="ready"
+          @add="addToCompare"
+          @affordability="affordabilityOpen = true"
+          @repayment-compare="repaymentCompareOpen = true"
+        />
       </aside>
     </div>
 
@@ -29,6 +36,8 @@
     </section>
 
     <CompareModal v-model="modalOpen" :items="compareList" @remove="removeCompare" />
+    <AffordabilityModal v-model="affordabilityOpen" :settings="settings" />
+    <RepaymentCompareModal v-model="repaymentCompareOpen" :settings="settings" />
   </div>
 </template>
 
@@ -42,11 +51,15 @@ import LoanSection from './components/business/LoanSection.vue'
 import ResultPanel from './components/business/ResultPanel.vue'
 import CompareSection from './components/compare/CompareSection.vue'
 import CompareModal from './components/compare/CompareModal.vue'
+import AffordabilityModal from './components/tools/AffordabilityModal.vue'
+import RepaymentCompareModal from './components/tools/RepaymentCompareModal.vue'
 
 const { settings, result, ready, compareList, loanType, addToCompare, removeCompare, clearCompare } =
   useLoanCalc()
 
 const modalOpen = ref(false)
+const affordabilityOpen = ref(false)
+const repaymentCompareOpen = ref(false)
 
 function handleExport() {
   downloadCompareCsv(compareList.value)
