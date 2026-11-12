@@ -178,7 +178,7 @@ function isBest(item, key) {
   margin-left: 4px;
   padding: 1px 5px;
   border-radius: 999px;
-  background: rgba(15, 157, 118, .12);
+  background: var(--c-success-soft);
   background: color-mix(in srgb, var(--c-success) 12%, transparent);
   color: var(--c-success);
   font-size: 10px;
@@ -189,7 +189,7 @@ function isBest(item, key) {
 }
 
 .compare-table tbody tr:hover td {
-  background: #f8fafd;
+  background: var(--c-hover);
 }
 
 .compare-table .empty-tip {

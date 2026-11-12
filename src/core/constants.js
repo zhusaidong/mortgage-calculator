@@ -11,7 +11,7 @@ export const PAY_TYPE = {
 // 商贷利率来源
 export const RATE_MODE = { LPR: 'lpr', DIRECT: 'direct' }
 
-// 贷款类型（旧版 tab 仅切换展示，不影响拆分计算）
+// 贷款类型：决定公积金与商贷的拆分方式
 export const LOAN_TYPE = { COMBO: 'combo', COMMERCIAL: 'commercial', FUND: 'fund' }
 
 // 控件初值 ≠ 用户已录入：首屏是否出结果由 useLoanCalc 的 ready 决定，不要在此处“预填”出可算的数
@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS = {
   housePrice: 50,
   downRate: 15,
   fundAmt: 0,
+  loanType: LOAN_TYPE.COMBO,
   loanYear: 30,
   lprVal: 3.5,
   bpVal: -45,

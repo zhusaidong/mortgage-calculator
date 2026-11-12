@@ -1,4 +1,4 @@
-import { PAY_TYPE, RATE_MODE, DEFAULT_SETTINGS } from './constants.js'
+import { PAY_TYPE, RATE_MODE, LOAN_TYPE, DEFAULT_SETTINGS } from './constants.js'
 
 const MONTHS_PER_YEAR = 12
 const WAN = 10000
@@ -105,11 +105,19 @@ export function computeResult(settings = {}) {
     s.rateMode === RATE_MODE.LPR || s.rateMode === RATE_MODE.DIRECT
       ? s.rateMode
       : DEFAULT_SETTINGS.rateMode
+  const loanType =
+    s.loanType === LOAN_TYPE.COMMERCIAL || s.loanType === LOAN_TYPE.FUND
+      ? s.loanType
+      : LOAN_TYPE.COMBO
 
   const totalLoanW = housePrice * (1 - downRate / 100)
   const downW = (housePrice * downRate) / 100
-  // 公积金贷款不能超过贷款总额，也不能为负，否则月供会脱离房屋实际价值
-  const fundW = Math.min(Math.max(fundAmt, 0), Math.max(totalLoanW, 0))
+  const loanTotalW = Math.max(totalLoanW, 0)
+  // 公积金贷款不能超过贷款总额，也不能为负；纯商贷归零，纯公积金取全部
+  let fundW
+  if (loanType === LOAN_TYPE.COMMERCIAL) fundW = 0
+  else if (loanType === LOAN_TYPE.FUND) fundW = loanTotalW
+  else fundW = Math.min(Math.max(fundAmt, 0), loanTotalW)
   const comW = Math.max(0, totalLoanW - fundW)
   const comRate = rateMode === RATE_MODE.LPR ? lprVal + bpVal / 100 : comRateDirect
 
@@ -132,6 +140,7 @@ export function computeResult(settings = {}) {
   const totalInterestW = (fundLoan.totalInt + comLoan.totalInt) / WAN
 
   return {
+    loanType,
     comRate,
     totalLoanW,
     downW,

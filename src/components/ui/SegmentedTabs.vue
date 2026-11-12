@@ -82,7 +82,7 @@ function onKeydown(event, index) {
   gap: 2px;
   padding: 3px;
   border-radius: var(--radius-md);
-  background: #f2f4f7;
+  background: var(--c-surface-2);
 }
 
 .seg-item {
@@ -110,7 +110,7 @@ function onKeydown(event, index) {
 
 .seg-item.is-active {
   background: var(--c-surface);
-  box-shadow: 0 1px 3px rgba(16, 24, 40, .12);
+  box-shadow: var(--shadow-thumb);
   color: var(--c-primary);
   font-weight: 600;
 }
@@ -121,6 +121,6 @@ function onKeydown(event, index) {
 }
 
 .seg-item.is-active:focus-visible {
-  box-shadow: 0 1px 3px rgba(16, 24, 40, .12), var(--focus-ring);
+  box-shadow: var(--shadow-thumb), var(--focus-ring);
 }
 </style>

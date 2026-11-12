@@ -67,6 +67,7 @@
         <button class="btn afford-btn" type="button" @click="emit('affordability')">我能买多贵？</button>
         <button class="btn compare-repay-btn" type="button" @click="emit('repayment-compare')">还款方式对比</button>
       </div>
+      <ReportActions :settings="settings" :result="result" />
 
       <p class="result-note">
         公积金冲抵为估算模型：优先冲公积金月供，剩余冲商贷；各地公积金政策不同，仅预算参考。银行偿贷比按税前月收入计算，仅作审批参考。
@@ -78,6 +79,7 @@
 <script setup>
 import { computed } from 'vue'
 import SectionCard from '../ui/SectionCard.vue'
+import ReportActions from '../report/ReportActions.vue'
 import { fmtMoney, fmtPercent } from '../../core/format.js'
 
 const props = defineProps({

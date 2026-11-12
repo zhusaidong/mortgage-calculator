@@ -1,3 +1,5 @@
+import { fmtMoneyPlain } from '../core/format.js'
+
 export const CSV_HEADERS = [
   '序号',
   '房屋总价(万)',
@@ -80,6 +82,63 @@ export function downloadCompareCsv(items) {
   const link = document.createElement('a')
   link.href = url
   link.download = `房贷对比_${new Date().toLocaleDateString()}.csv`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+  return true
+}
+
+// 还款明细导出的列定义，顺序与明细表一致
+export const SCHEDULE_CSV_HEADERS = [
+  '期数',
+  '年份',
+  '月供(元)',
+  '本金(元)',
+  '利息(元)',
+  '公积金抵扣(元)',
+  '自付(元)',
+  '剩余本金(元)'
+]
+
+/** 生成还款明细 CSV 文本（带 UTF-8 BOM） */
+export function buildScheduleCsv(rows) {
+  const list = Array.isArray(rows) ? rows : []
+  const body = list.map((row, index) =>
+    [
+      Number.isFinite(Number(row.month)) ? row.month : index + 1,
+      Number.isFinite(Number(row.year)) ? row.year : Math.ceil((index + 1) / 12),
+      fmtMoneyPlain(row.pay),
+      fmtMoneyPlain(row.principal),
+      fmtMoneyPlain(row.interest),
+      fmtMoneyPlain(row.gjjOffset),
+      fmtMoneyPlain(row.selfPay),
+      fmtMoneyPlain(row.remain)
+    ].join(',')
+  )
+  return '\uFEFF' + [SCHEDULE_CSV_HEADERS.join(','), ...body].join('\n')
+}
+
+/**
+ * 下载还款明细 CSV
+ * @returns {boolean} 是否成功触发下载
+ */
+export function downloadScheduleCsv(rows) {
+  const list = Array.isArray(rows) ? rows : []
+  if (list.length === 0) {
+    if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+      window.alert('暂无可导出的还款明细')
+    }
+    return false
+  }
+  // 仅在此函数内触碰 DOM，保证模块在 Node 中可安全导入
+  if (typeof document === 'undefined' || typeof URL === 'undefined') return false
+
+  const blob = new Blob([buildScheduleCsv(list)], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `房贷还款明细_${new Date().toLocaleDateString()}.csv`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

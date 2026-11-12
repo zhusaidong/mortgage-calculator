@@ -7,9 +7,7 @@
         <LoanSection
           :settings="settings"
           :result="result"
-          :loan-type="loanType"
           :ready="ready"
-          @update:loan-type="loanType = $event"
         />
       </main>
 
@@ -25,6 +23,10 @@
       </aside>
     </div>
 
+    <section class="pane-detail">
+      <RepaymentDetailSection :settings="settings" :ready="ready" />
+    </section>
+
     <section class="pane-compare">
       <CompareSection
         :items="compareList"
@@ -38,6 +40,8 @@
     <CompareModal v-model="modalOpen" :items="compareList" @remove="removeCompare" />
     <AffordabilityModal v-model="affordabilityOpen" :settings="settings" />
     <RepaymentCompareModal v-model="repaymentCompareOpen" :settings="settings" />
+
+    <ReportSheet :settings="settings" :result="result" :ready="ready" />
   </div>
 </template>
 
@@ -49,12 +53,14 @@ import IncomeSection from './components/business/IncomeSection.vue'
 import HouseSection from './components/business/HouseSection.vue'
 import LoanSection from './components/business/LoanSection.vue'
 import ResultPanel from './components/business/ResultPanel.vue'
+import RepaymentDetailSection from './components/business/RepaymentDetailSection.vue'
 import CompareSection from './components/compare/CompareSection.vue'
 import CompareModal from './components/compare/CompareModal.vue'
 import AffordabilityModal from './components/tools/AffordabilityModal.vue'
 import RepaymentCompareModal from './components/tools/RepaymentCompareModal.vue'
+import ReportSheet from './components/report/ReportSheet.vue'
 
-const { settings, result, ready, compareList, loanType, addToCompare, removeCompare, clearCompare } =
+const { settings, result, ready, compareList, addToCompare, removeCompare, clearCompare } =
   useLoanCalc()
 
 const modalOpen = ref(false)
@@ -97,6 +103,10 @@ function handleExport() {
   margin-top: var(--gap-page, 20px);
 }
 
+.pane-detail {
+  margin-top: var(--gap-page, 20px);
+}
+
 @media (max-width: 900px) {
   .page {
     padding: 12px;
@@ -116,6 +126,10 @@ function handleExport() {
   }
 
   .pane-compare {
+    margin-top: 16px;
+  }
+
+  .pane-detail {
     margin-top: 16px;
   }
 }

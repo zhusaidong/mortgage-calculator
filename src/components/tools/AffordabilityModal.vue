@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(16, 24, 40, .45);
+  background: var(--c-overlay);
   animation: aff-fade 140ms ease;
 }
 

@@ -68,7 +68,7 @@ function isActive(optionValue) {
 }
 
 .qb-btn:hover {
-  border-color: #cfd8e3;
+  border-color: var(--c-border-hover);
   color: var(--c-text);
 }
 

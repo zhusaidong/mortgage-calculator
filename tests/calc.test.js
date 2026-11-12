@@ -195,10 +195,19 @@ test('等额本金模式下 origin 取首月月供', () => {
   assert.ok(res.origin > interestMode.origin)
 })
 
-test('computeResult 忽略 loanType', () => {
-  const withTab = computeResult({ ...COMBO_SETTINGS, loanType: 'fund' })
-  const withoutTab = computeResult(COMBO_SETTINGS)
-  assert.deepEqual(withTab, withoutTab)
+test('computeResult 按 loanType 调整公积金与商贷拆分', () => {
+  const combo = computeResult(COMBO_SETTINGS)
+  const commercial = computeResult({ ...COMBO_SETTINGS, loanType: 'commercial' })
+  const fund = computeResult({ ...COMBO_SETTINGS, loanType: 'fund' })
+
+  assert.equal(combo.loanType, 'combo')
+  assert.equal(commercial.loanType, 'commercial')
+  assert.equal(fund.loanType, 'fund')
+
+  assert.equal(commercial.fundW, 0)
+  assert.equal(commercial.comW, combo.totalLoanW)
+  assert.equal(fund.fundW, combo.totalLoanW)
+  assert.equal(fund.comW, 0)
 })
 
 test('buildCompareItem 字段与中文 payType', () => {

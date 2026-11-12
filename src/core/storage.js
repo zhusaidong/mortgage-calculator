@@ -3,7 +3,8 @@ import {
   STORAGE_KEY_COMPARE,
   DEFAULT_SETTINGS,
   RATE_MODE,
-  PAY_TYPE
+  PAY_TYPE,
+  LOAN_TYPE
 } from './constants.js'
 
 export { STORAGE_KEY_SETTING, STORAGE_KEY_COMPARE }
@@ -12,6 +13,7 @@ const BUSINESS_FIELDS = Object.keys(DEFAULT_SETTINGS)
 const NUMERIC_FIELDS = BUSINESS_FIELDS.filter((key) => typeof DEFAULT_SETTINGS[key] === 'number')
 const RATE_MODES = new Set(Object.values(RATE_MODE))
 const PAY_MODES = new Set(Object.values(PAY_TYPE))
+const LOAN_TYPES = new Set(Object.values(LOAN_TYPE))
 
 // SSR / 隐私模式 / 禁用存储时安全返回，绝不抛错
 function getStorage() {
@@ -76,6 +78,8 @@ export function loadSettings() {
       result.rateMode = RATE_MODES.has(value) ? value : DEFAULT_SETTINGS.rateMode
     } else if (key === 'payMode') {
       result.payMode = PAY_MODES.has(value) ? value : DEFAULT_SETTINGS.payMode
+    } else if (key === 'loanType') {
+      result.loanType = LOAN_TYPES.has(value) ? value : DEFAULT_SETTINGS.loanType
     }
   }
   return result

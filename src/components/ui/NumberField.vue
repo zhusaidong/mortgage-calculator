@@ -111,7 +111,7 @@ function onInput(event) {
 }
 
 .nf-input[readonly] {
-  background: #f7f8fa;
+  background: var(--c-surface-2);
   color: var(--c-text-2);
   cursor: default;
 }

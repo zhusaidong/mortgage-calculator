@@ -11,7 +11,7 @@ import {
   STORAGE_KEY_SETTING,
   STORAGE_KEY_COMPARE
 } from '../src/core/storage.js'
-import { DEFAULT_SETTINGS, PAY_TYPE, RATE_MODE } from '../src/core/constants.js'
+import { DEFAULT_SETTINGS, PAY_TYPE, RATE_MODE, LOAN_TYPE } from '../src/core/constants.js'
 
 function createLocalStorageMock() {
   const data = new Map()
@@ -93,6 +93,7 @@ test('saveSettings / loadSettings 往返一致且只写业务字段', () => {
     housePrice: 420,
     downRate: 20,
     fundAmt: 80,
+    loanType: LOAN_TYPE.COMMERCIAL,
     loanYear: 25,
     payMode: PAY_TYPE.PRINCIPAL,
     rateMode: RATE_MODE.DIRECT,
@@ -104,6 +105,7 @@ test('saveSettings / loadSettings 往返一致且只写业务字段', () => {
     housePrice: 420,
     downRate: 20,
     fundAmt: 80,
+    loanType: LOAN_TYPE.COMMERCIAL,
     loanYear: 25,
     lprVal: DEFAULT_SETTINGS.lprVal,
     bpVal: DEFAULT_SETTINGS.bpVal,

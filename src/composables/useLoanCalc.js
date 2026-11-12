@@ -8,12 +8,10 @@ import {
   saveCompareList,
   clearCompareList
 } from '../core/storage.js'
-import { LOAN_TYPE } from '../core/constants.js'
 
 export function useLoanCalc() {
   const settings = reactive(loadSettings())
   const compareList = ref(loadCompareList())
-  const loanType = ref(LOAN_TYPE.COMBO)
   // ready 表达“用户是否已录入过参数”：回访（有存档）直接出结果，首次访问保持结果区空白
   const ready = ref(hasStoredSettings())
   const result = computed(() => computeResult(settings))
@@ -57,7 +55,6 @@ export function useLoanCalc() {
     result,
     ready,
     compareList,
-    loanType,
     addToCompare,
     removeCompare,
     clearCompare
